@@ -1,10 +1,23 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 type Note = { id: number; text: string }
 
 export default function App() {
   const [text, setText] = useState<string>('')
   const [notes, setNotes] = useState<Note[]>([])
+
+  // Only works in Chrome Extension, not in Web
+  // Load notes from Chrome storage
+  useEffect(() => {
+    chrome.storage.sync.get({ notes: [] }, (data) => {
+      setNotes(data.notes as Note[])
+    })
+  }, [])
+
+  // Save notes to Chrome storage whenever it changes
+  useEffect(() => {
+    chrome.storage.sync.set({ notes })
+  }, [notes])
 
   function addNote() {
     if (!text.trim()) return
